@@ -9,13 +9,19 @@ if [[ "$TERM" == screen* ]]; then
   fi
 
   # use the current user as the prefix of the current tab title 
-  TAB_TITLE_PREFIX='"`'$_GET_HOST'`:`'$_GET_PATH' | sed "s:..*/::"`$PROMPT_CHAR"'
+  # TAB_TITLE_PREFIX='"`'$_GET_HOST'`:`'$_GET_PATH' | sed "s:..*/::"`$PROMPT_CHAR"'
+  TAB_TITLE_PREFIX='"`'$_GET_HOST'`"'
   # when at the shell prompt, show a truncated version of the current path (with
   # standard ~ replacement) as the rest of the title.
-  TAB_TITLE_PROMPT='$SHELL:t'
+  # TAB_TITLE_PROMPT='$SHELL:t'
+  if [ `id -u` = "0" ]; then
+	TAB_TITLE_PROMPT='#'
+  else
+	TAB_TITLE_PROMPT='$'
+  fi
   # when running a command, show the title of the command as the rest of the
   # title (truncate to drop the path to the command)
-  TAB_TITLE_EXEC='$cmd[1]:t'
+  TAB_TITLE_EXEC=':$cmd[1]:t'
 
   # use the current path (with standard ~ replacement) in square brackets as the
   # prefix of the tab window hardstatus.
@@ -25,7 +31,7 @@ if [[ "$TERM" == screen* ]]; then
   TAB_HARDSTATUS_PROMPT='$SHELL:t'
   # when running a command, show the command name and arguments as the rest of
   # the title
-  TAB_HARDSTATUS_EXEC='$cmd'
+  TAB_HARDSTATUS_EXEC=':$cmd'
 
   # tell GNU screen what the tab window title ($1) and the hardstatus($2) should be
   function screen_set()
@@ -40,15 +46,15 @@ if [[ "$TERM" == screen* ]]; then
   function preexec()
   {
     local -a cmd; cmd=(${(z)1}) # the command string
-    eval "tab_title=$TAB_TITLE_PREFIX:$TAB_TITLE_EXEC"
-    eval "tab_hardstatus=$TAB_HARDSTATUS_PREFIX:$TAB_HARDSTATUS_EXEC"
+    eval "tab_title=$TAB_TITLE_PREFIX$TAB_TITLE_EXEC"
+    eval "tab_hardstatus=$TAB_HARDSTATUS_PREFIX$TAB_HARDSTATUS_EXEC"
     screen_set $tab_title $tab_hardstatus
   }
   # called by zsh before showing the prompt
   function precmd()
   {
-    eval "tab_title=$TAB_TITLE_PREFIX:$TAB_TITLE_PROMPT"
-    eval "tab_hardstatus=$TAB_HARDSTATUS_PREFIX:$TAB_HARDSTATUS_PROMPT"
+    eval "tab_title=$TAB_TITLE_PREFIX$TAB_TITLE_PROMPT"
+    eval "tab_hardstatus=$TAB_HARDSTATUS_PREFIX$TAB_HARDSTATUS_PROMPT"
     screen_set $tab_title $tab_hardstatus
   }
 fi
