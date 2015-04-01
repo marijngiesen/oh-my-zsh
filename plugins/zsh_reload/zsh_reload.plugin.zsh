@@ -1,4 +1,6 @@
 # reload zshrc
+alias reload!='src'
+
 function src()
 {
   local cache=$ZSH_CACHE_DIR

@@ -1,0 +1,16 @@
+#!/bin/zsh
+
+RSYNC_BINARY=/usr/bin/rsync
+
+# Push ZSH environment to a remote server
+if [ -z "$1" ]; then
+    echo "Usage: $0 <remote server>"
+    exit 1
+fi
+
+if [ ! -x  $RSYNC_BINARY ]; then
+	echo "Error: rsync binary not found"
+	exit 1
+fi
+
+$RSYNC_BINARY -a --delete --filter="+ .oh-my-zsh/" --filter="- .oh-my-zsh/custom/**" --filter="- .oh-my-zsh/cache/**" --filter="+ .oh-my-zsh/**" --filter="+ .zshrc" --filter="- *" ~/ $1:
